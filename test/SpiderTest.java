@@ -1,7 +1,6 @@
 package test;
 
 import main.Spider;
-import org.jsoup.Jsoup;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -9,16 +8,32 @@ import static org.junit.Assert.*;
 public class SpiderTest {
 
     @Test
-    public void crawl() {
+    public void WWWReturnsFullAddress() {
+        Spider spider = new Spider();
+        assertEquals("www.google.com",spider.transformLink("www.google.com"));
     }
 
     @Test
-    public void transformLink() {
+    public void HttpsReturnsHttpsAddress() {
         Spider spider = new Spider();
-        assertEquals("www.google.com",spider.transformLink("www.google.com"));
         assertEquals("https://www.google.com/images",spider.transformLink("https://www.google.com/images"));
+    }
+
+    @Test
+    public void DoubleSlashReturnsFullAddress() {
+        Spider spider = new Spider();
         assertEquals("www.google.com/images",spider.transformLink("//google.com/images"));
+    }
+
+    @Test
+    public void HashReturnsAnchorAddress() {
+        Spider spider = new Spider();
         assertEquals("www.google.com/images/#anchor",spider.transformLink("#anchor"));
-        assertEquals("www.google.com/maps",spider.transformLink("../maps"));
+    }
+
+    @Test
+    public void DotDotSlashReturnsFullAddress() {
+        Spider spider = new Spider();
+        assertEquals("www.google.com/images/#anchor",spider.transformLink("#anchor"));
     }
 }

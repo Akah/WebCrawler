@@ -11,7 +11,7 @@ public class Main {
         try {
             Document doc = Jsoup.connect("http://www.google.com/").get();
             Elements links = doc.getElementsByTag("a");
-            //for(Element link: links){
+            for(Element link: links){
                 String text = link.text();
                 String href = link.attr("href");
                 //System.out.println(text+": "+href);
@@ -19,7 +19,7 @@ public class Main {
             }
             String title = doc.title();
             System.out.println(title);
-        } catch (Exception e) {
+        }catch(Exception e) {
             e.printStackTrace();
         }
 
