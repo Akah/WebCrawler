@@ -10,30 +10,43 @@ public class SpiderTest {
     @Test
     public void WWWReturnsFullAddress() {
         Spider spider = new Spider();
-        assertEquals("www.google.com",spider.transformLink("www.google.com"));
+        assertEquals("www.google.com",spider.correctLink("www.google.com","www.google.com/images"));
     }
 
     @Test
-    public void HttpsReturnsHttpsAddress() {
+    public void httpsReturnsHttpsAddress() {
         Spider spider = new Spider();
-        assertEquals("https://www.google.com/images",spider.transformLink("https://www.google.com/images"));
+        assertEquals("https://www.google.com/images",spider.correctLink("https://www.google.com/images","www.google.com"));
     }
 
     @Test
-    public void DoubleSlashReturnsFullAddress() {
+    public void doubleSlashReturnsFullAddress() {
         Spider spider = new Spider();
-        assertEquals("www.google.com/images",spider.transformLink("//google.com/images"));
+        assertEquals("www.google.com/images",spider.correctLink("//google.com/images","www.google.com"));
     }
 
     @Test
-    public void HashReturnsAnchorAddress() {
+    public void singleSlashReturnsAppendedAddress() {
         Spider spider = new Spider();
-        assertEquals("www.google.com/images/#anchor",spider.transformLink("#anchor"));
+        assertEquals("www.google.com/images",spider.correctLink("/images","www.google.com"));
     }
 
     @Test
-    public void DotDotSlashReturnsFullAddress() {
+    public void hashReturnsAnchorAddress() {
         Spider spider = new Spider();
-        assertEquals("www.google.com/images/#anchor",spider.transformLink("#anchor"));
+        assertEquals("www.google.com/images#anchor",spider.correctLink("#anchor","www.google.com/images"));
+    }
+
+    @Test
+    public void dotDotSlashReturnsFullAddress() {
+        Spider spider = new Spider();
+        assertEquals("www.google.com",spider.correctLink("../","www.google.com/images"));
+    }
+
+    @Test
+    public void emptyStringOrNullReturnsNull() {
+        Spider spider = new Spider();
+        assertEquals(null,spider.correctLink("","www.google.com"));
+        //assertEquals(null,spider.getData(null,"www.google.com")); // Error here
     }
 }
