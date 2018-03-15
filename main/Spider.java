@@ -8,9 +8,10 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 import main.DataValue;
+
 public class Spider {
-    public void createJson(String url){
-        List<Object> objects = new ArrayList<>();
+    public void createJson(String url,String currentUrl){
+        List<DataValue> objects = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(url).get();
             String title = doc.title();
@@ -18,18 +19,21 @@ public class Spider {
             for(Element link: links) {
                 String text = link.text();
                 String href = link.attr("href");
-                DataValue data = new DataValue(text,href,url);
+                DataValue data = new DataValue(text,correctLink(href,currentUrl),url);
                 objects.add(data);
             }
         }catch(Exception e) {
             e.printStackTrace();
         }
 
-        //System.out.print("[");
-        for (Object object: objects) {
-            System.out.println(object.get);
+        for (DataValue object: objects) {
+            System.out.println(object.getId());
+            System.out.println(object.getText());
+            System.out.println(object.getLink());
+            System.out.println("-----------------------------------------------------------");
         }
-        //System.out.print("]");
+
+        System.out.println("\n"+objects.size()+" objects found");
     }
 
     public String correctLink(String link, String currentUrl){
@@ -42,8 +46,8 @@ public class Spider {
             url = currentUrl+link;
         }
         else if (link.startsWith("/")){
-            if(link.charAt(1)=='/'){
-                url = link.replaceFirst("//","www.");
+            if(link.startsWith("//")){
+                url = link.replaceFirst("//","");//this requires attention later
             } else {
                 url = currentUrl+link;
 ;           }
