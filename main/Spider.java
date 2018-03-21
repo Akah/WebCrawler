@@ -5,38 +5,68 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
-import java.util.List;
-import main.DataValue;
+import java.io.IOException;
+import java.util.LinkedList;
 
 public class Spider {
-    public void createJson(String url,String currentUrl){
-        List<DataValue> objects = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect(url).get();
-            String title = doc.title();
-            Elements links = doc.getElementsByTag("a");
-            for(Element link: links) {
-                String text = link.text();
-                String href = link.attr("href");
-                DataValue data = new DataValue(text,correctLink(href,currentUrl),url);
-                objects.add(data);
+    private LinkedList<String> queue = new LinkedList<>();
+    public Spider(String startPoint){ queue.add(startPoint); }
+
+    public void crawl() {
+        int limit = 100;
+        long start = System.currentTimeMillis();
+        int counter = 0;
+        while (!queue.isEmpty()) {
+            String url = queue.getFirst();
+            if(url!="") {
+                try {
+                    Document doc = Jsoup.connect(url).get();
+                    Elements links = doc.getElementsByTag("a");
+                    for (Element link : links) {
+                        String href = link.attr("abs:href");
+                        if(queue.indexOf(href)==-1){//if not in list
+                            queue.add(href);
+                        }
+
+                    }
+                    //createJson(doc, url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                counter++;
             }
-        }catch(Exception e) {
-            e.printStackTrace();
+            queue.pop();
+            System.out.println(counter);
+            if(counter == limit) break;
         }
-
-        for (DataValue object: objects) {
-            System.out.println(object.getId());
-            System.out.println(object.getText());
-            System.out.println(object.getLink());
-            System.out.println("-----------------------------------------------------------");
+        System.out.println("queue size: "+queue.size());
+        if(queue.size()<=50) {
+            for (String link : queue) {
+                System.out.println(link);
+            }
         }
-
-        System.out.println("\n"+objects.size()+" objects found");
+        long end = System.currentTimeMillis();
+        float secs = (end-start)/1000;
+        System.out.println(secs+" seconds");
+        System.out.println((float)((end-start)/1000.00)/60+" minutes");
+        System.out.println((float)limit/secs+" file/second");
     }
 
-    public String correctLink(String link, String currentUrl){
+    private void createJson (Document doc,String url) {
+        String title = doc.title();
+        DataValue data = new DataValue(url, title);
+        //post to database
+    }
+
+    private void printOut (DataValue object ){
+        System.out.println(object.getId());
+        System.out.println(object.getTitle());
+        System.out.println(object.getLink());
+        System.out.println("-----------------------------------------------------------");
+        //System.out.println("\n"+objects.size()+" objects found");
+    }
+
+    private String correctLink (String link, String currentUrl) {
         //check if string is valid
         if(link.equals(null) || link.equals("") || link.contains(" ")){
             return null;

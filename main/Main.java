@@ -1,12 +1,11 @@
 package main;
 
+import java.util.UUID;
+
 public class Main {
 
     public static void main(String[] args) {
-        Spider spider = new Spider();
-        spider.createJson(
-                "https://www.duckduckgo.com",
-                "https://www.duckduckgo.com"
-        );//must be full http address for url
+        Spider spider = new Spider("https://www.duckduckgo.com/");//must be full http(s) address for url with / at end
+        spider.crawl();
     }
 }
